@@ -30,7 +30,11 @@ if (!config.BOT_TOKEN) {
 
 const http = require("http");
 const PORT = process.env.PORT || 3000;
-http.createServer((req, res) => res.end("OK")).listen(PORT, () => {
+const healthServer = http.createServer((req, res) => res.end("OK"));
+healthServer.on("error", (err) => {
+  console.error(`[WARN] Health-check server could not bind port ${PORT}: ${err.message}`);
+});
+healthServer.listen(PORT, () => {
   console.log(`Health-check listening on port ${PORT}`);
 });
 
