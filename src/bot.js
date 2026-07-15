@@ -8,8 +8,6 @@ const {
   EmbedBuilder,
   Colors,
 } = require("discord.js");
-const path = require("path");
-const fs = require("fs");
 const config = require("./config");
 const {
   login,
@@ -30,16 +28,13 @@ if (!config.BOT_TOKEN) {
   process.exit(1);
 }
 
+const http = require("http");
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => res.end("OK")).listen(PORT, () => {
+  console.log(`Health-check listening on port ${PORT}`);
+});
+
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-
-const HEARTBEAT_FILE = path.join(__dirname, "..", "data", "heartbeat");
-
-function writeHeartbeat() {
-  try {
-    fs.mkdirSync(path.dirname(HEARTBEAT_FILE), { recursive: true });
-    fs.writeFileSync(HEARTBEAT_FILE, String(Date.now()));
-  } catch {}
-}
 
 process.on("unhandledRejection", (reason) => {
   console.error("[FATAL] Unhandled rejection:", reason);
@@ -110,8 +105,6 @@ async function registerCommands(c) {
 client.once(Events.ClientReady, async (c) => {
   await registerCommands(c);
   await resumeRunningAccounts();
-  writeHeartbeat();
-  setInterval(writeHeartbeat, 30_000);
 });
 
 async function resumeRunningAccounts() {
