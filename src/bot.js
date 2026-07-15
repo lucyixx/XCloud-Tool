@@ -505,14 +505,6 @@ async function handleDelete(interaction, uid) {
   return interaction.editReply({ embeds: [ok("Account Deleted", lines([["Username", username]]))] });
 }
 
-process.on("unhandledRejection", (err) => {
-  console.error("Unhandled rejection:", err);
-});
-
-process.on("uncaughtException", (err) => {
-  console.error("Uncaught exception:", err);
-});
-
 async function shutdown(signal) {
   console.log(`Received ${signal}, shutting down...`);
   runner.stopAll();
