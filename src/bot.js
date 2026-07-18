@@ -1,3 +1,8 @@
+const _log = console.log.bind(console);
+const _error = console.error.bind(console);
+console.log = (...args) => _log(`[${new Date().toISOString()}]`, ...args);
+console.error = (...args) => _error(`[${new Date().toISOString()}]`, ...args);
+
 const {
   Client,
   GatewayIntentBits,
@@ -77,7 +82,6 @@ function reply(interaction, color, title, description, ephemeral = true) {
     : interaction.reply(payload);
 }
 
-// Get the single account for this Discord user
 function getAccountData(uid) {
   const usernames = store.listUsernames(uid);
   if (usernames.length === 0) return { error: "You have no logged-in account. Use /login first." };

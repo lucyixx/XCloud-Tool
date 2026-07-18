@@ -98,7 +98,6 @@ async function getRentalSessions(accountKey, { page = 1, limit = 25 } = {}) {
   }
 }
 
-// Fetch shared sessions (shared-with-me)
 async function getSharedSessions(accountKey, { page = 1, limit = 20 } = {}) {
   try {
     const res = await http.get(
@@ -118,7 +117,6 @@ async function getSharedSessions(accountKey, { page = 1, limit = 20 } = {}) {
         : null;
       return {
         inviteId: invite.id,
-        // sessionId may be null/undefined — extend is optional
         sessionId: invite.sessionId || null,
         sessionName: s.sessionName || null,
         shortId: s.device?.shortId || invite.sessionId?.slice(0, 8) || null,
@@ -274,7 +272,6 @@ async function autoExtendExpiringSessions(accountKey, {
   return results;
 }
 
-// Auto extend shared sessions — only extends if sessionId is present
 async function autoExtendExpiringSharedSessions(accountKey, {
   thresholdMinutes = config.EXTEND_THRESHOLD_MINUTES,
   rentalHours = config.EXTEND_RENTAL_HOURS,
@@ -282,7 +279,6 @@ async function autoExtendExpiringSharedSessions(accountKey, {
 } = {}) {
   if (!sessions) sessions = await getSharedSessions(accountKey);
 
-  // Only process entries that have a sessionId (extend is optional)
   const expiring = sessions.filter(
     (s) => s.sessionId && s.remainMinutes != null && s.remainMinutes < thresholdMinutes
   );
