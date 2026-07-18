@@ -104,6 +104,21 @@ function getSessionCache(discordUserId, username) {
   return getAccount(discordUserId, username)?.sessionCache || [];
 }
 
+function saveSharedSessionCache(discordUserId, username, sharedSessions) {
+  const sharedSessionCache = sharedSessions
+    .filter((s) => s.sessionId)
+    .map((s) => ({
+      id: s.sessionId,
+      label: s.sessionName || s.shortId || s.sessionId.slice(0, 8),
+      remainMinutes: s.remainMinutes,
+    }));
+  setAccount(discordUserId, username, { sharedSessionCache });
+}
+
+function getSharedSessionCache(discordUserId, username) {
+  return getAccount(discordUserId, username)?.sharedSessionCache || [];
+}
+
 module.exports = {
   listAccounts,
   listUsernames,
@@ -113,4 +128,6 @@ module.exports = {
   listAllRunningAccounts,
   saveSessionCache,
   getSessionCache,
+  saveSharedSessionCache,
+  getSharedSessionCache,
 };

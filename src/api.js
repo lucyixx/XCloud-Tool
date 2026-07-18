@@ -201,8 +201,16 @@ async function extendSession(
     return { ok: false, locked: true };
   }
 
-  if (remainMinutes !== null && remainMinutes >= config.EXTEND_SKIP_THRESHOLD) {
-    return { ok: false, overLimit: true, reason: "Tổng thời gian thiết bị không quá 5 giờ" };
+  if (remainMinutes !== null) {
+    const projectedMinutes = remainMinutes + rentalHours * 60;
+    if (projectedMinutes >= config.MAX_TOTAL_MINUTES) {
+      const maxHours = config.MAX_TOTAL_MINUTES / 60;
+      return {
+        ok: false,
+        overLimit: true,
+        reason: `Còn lại ${remainMinutes}m + ${rentalHours}h sẽ vượt quá giới hạn tổng thời gian không quá ${maxHours} giờ`,
+      };
+    }
   }
 
   try {

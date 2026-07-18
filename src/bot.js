@@ -169,10 +169,17 @@ async function handleAutocomplete(interaction) {
       if (error) return interaction.respond([]);
 
       const cached = store.getSessionCache(uid, username);
-      const allSessions = cached.map((s) => ({
-        name: `${s.label}${s.remainMinutes != null ? ` (${s.remainMinutes}m)` : ""}`,
-        value: s.id,
-      }));
+      const sharedCached = store.getSharedSessionCache(uid, username);
+      const allSessions = [
+        ...cached.map((s) => ({
+          name: `${s.label}${s.remainMinutes != null ? ` (${s.remainMinutes}m)` : ""}`,
+          value: s.id,
+        })),
+        ...sharedCached.map((s) => ({
+          name: `${s.label} (shared)${s.remainMinutes != null ? ` (${s.remainMinutes}m)` : ""}`,
+          value: s.id,
+        })),
+      ];
 
       const query = String(focused.value).toLowerCase();
       const filtered = allSessions
@@ -349,6 +356,7 @@ async function handleDevices(interaction, uid) {
     getSharedSessions(accountKey),
   ]);
   store.saveSessionCache(uid, username, devices);
+  store.saveSharedSessionCache(uid, username, sharedSessions);
 
   if (!devices.length && !sharedSessions.length) {
     return interaction.editReply({ embeds: [info("No Devices", "No active rental sessions found.")] });
@@ -367,7 +375,8 @@ async function handleDevices(interaction, uid) {
         ])
       )
       .join("\n\n");
-    sections.push(`**── Main Devices (${devices.length}) ──**\n${mainBody}`);
+    const more = devices.length > 10 ? `\n\n_+${devices.length - 10} more not shown_` : "";
+    sections.push(`**── Main Devices (${devices.length}) ──**\n${mainBody}${more}`);
   }
 
   if (sharedSessions.length) {
@@ -382,7 +391,8 @@ async function handleDevices(interaction, uid) {
         ])
       )
       .join("\n\n");
-    sections.push(`**── Shared Devices (${sharedSessions.length}) ──**\n${sharedBody}`);
+    const more = sharedSessions.length > 10 ? `\n\n_+${sharedSessions.length - 10} more not shown_` : "";
+    sections.push(`**── Shared Devices (${sharedSessions.length}) ──**\n${sharedBody}${more}`);
   }
 
   const totalCount = devices.length + sharedSessions.length;
