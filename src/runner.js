@@ -29,6 +29,13 @@ function start(accountKey, account, onLog, intervalMs = config.POLL_INTERVAL_MS)
       const { valid, expired } = await checkSession(accountKey);
 
       if (!valid && expired) {
+        if (typeof account.username !== "string" || typeof account.password !== "string") {
+          onLog("[ERROR] Missing username/password. Please /login again. Stopping loop.");
+          stop(accountKey);
+          store.setAccount(discordUserId, username, { running: false });
+          return;
+        }
+
         const result = await login(accountKey, {
           username: account.username,
           password: account.password,

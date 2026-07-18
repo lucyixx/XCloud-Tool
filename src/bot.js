@@ -123,6 +123,10 @@ async function resumeRunningAccounts() {
   for (const { discordUserId, username, account } of store.listAllRunningAccounts()) {
     const accountKey = `${discordUserId}:${username}`;
     if (runner.isRunning(accountKey)) continue;
+    if (typeof account.username !== "string" || typeof account.password !== "string") {
+      store.setAccount(discordUserId, username, { running: false });
+      continue;
+    }
     runner.start(
       accountKey,
       account,
