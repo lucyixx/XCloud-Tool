@@ -1,1 +1,4 @@
 .env
+bot.log
+data/heartbeat
+data/sessions.json
